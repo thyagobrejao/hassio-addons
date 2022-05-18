@@ -1,0 +1,47 @@
+ARG BUILD_FROM
+FROM $BUILD_FROM
+
+# Install requirements for add-on
+RUN \
+    apk add --no-cache \
+    python3
+
+
+ENV STATIC_URL /static
+ENV STATIC_PATH /var/www/app/static
+COPY ./requirements.txt /var/www/requirements.txt
+RUN pip install -r /var/www/requirements.txt
+
+# Python 3 HTTP Server serves the current working dir
+# So let's set it to our add-on persistent data directory.
+WORKDIR /data
+
+# Copy data for add-on
+COPY run.sh /
+RUN chmod a+x /run.sh
+
+RUN \
+    ARCH="${BUILD_ARCH}" \
+    && if [[ "${BUILD_ARCH}" = "aarch64" ]]; then ARCH="arm64"; fi \
+    && if [[ "${BUILD_ARCH}" = "armhf" ]]; then ARCH="arm"; fi \
+    && if [[ "${BUILD_ARCH}" = "armv7" ]]; then ARCH="arm"; fi \
+    && if [[ "${BUILD_ARCH}" = "i386" ]]; then ARCH="386"; fi \
+    && wget -O /usr/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$ARCH \
+    && chmod +x /usr/bin/cloudflared
+
+CMD [ "/run.sh" ]
+
+
+ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:latest
+FROM $BUILD_FROM
+
+ARG BUILD_ARCH=amd64
+
+COPY rootfs /
+
+ENV STATIC_URL /static
+ENV STATIC_PATH /var/www/app/static
+COPY ./requirements.txt /var/www/requirements.txt
+RUN pip install -r /var/www/requirements.txt
+
+
