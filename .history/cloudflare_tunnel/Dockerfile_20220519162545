@@ -5,10 +5,10 @@ RUN \
     apk add --no-cache --virtual .build-dependencies \
     \
     && apk add --no-cache \
-    nginx \
-    nodejs \
-    openssl \
-    yarn
+    nginx=1.20.2-r0 \
+    nodejs=16.14.0-r \
+    openssl=1.1.1n-r0 \
+    yarn=1.22.17-r0
 
 ARG BUILD_ARCH=amd64
 RUN \
@@ -20,16 +20,11 @@ RUN \
     && wget -O /usr/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$ARCH \
     && chmod +x /usr/bin/cloudflared
 
-COPY web/nginx.conf /etc/nginx/http.d/default.conf
 
 WORKDIR /app
-COPY web/package*.json ./
-RUN yarn global add @quasar/cli
-COPY web/ .
 
-RUN yarn
-RUN quasar build
+COPY ./web /app
 
-COPY web/dist/spa /var/www/dist/spa
+COPY /app/dist/spa /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
