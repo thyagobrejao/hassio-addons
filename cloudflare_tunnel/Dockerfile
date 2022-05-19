@@ -30,6 +30,8 @@ COPY web/ .
 RUN yarn
 RUN quasar build
 
+RUN mkdir -p /var/www/dist/spa
+
 RUN cp -r /app/dist/spa /var/www/dist/spa
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
