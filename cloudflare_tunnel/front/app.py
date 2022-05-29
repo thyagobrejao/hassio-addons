@@ -5,6 +5,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
+    file = open('cacilda.txt', 'a+')
+    file.write("Woops! I have deleted the content!")
+    file.close()
     return render_template('hello.html')
 
 
