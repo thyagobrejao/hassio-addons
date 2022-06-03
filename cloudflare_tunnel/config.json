@@ -1,6 +1,6 @@
 {
   "name": "DJTec",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "slug": "djtec",
   "description": "Home Assistant tunnel and monitoring service",
   "url": "https://github.com/thyagobrejao/hassio-addons/tree/main/cloudflare_tunnel",
